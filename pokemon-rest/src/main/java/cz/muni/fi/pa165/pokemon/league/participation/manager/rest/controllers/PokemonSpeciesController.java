@@ -9,6 +9,7 @@ import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.Circular
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EntityIsUsedException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.exceptions.EntityUsedException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EvolutionChainTooLongException;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.NoSuchEntityException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.exceptions.InvalidParameterException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.exceptions.InvalidPreevolutionChangeException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -25,8 +26,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * This is the controller class of Pokemon Species to handle all the calls of rest api.
- * 
+ * This is the controller class of Pokemon Species to handle all the calls of
+ * rest api.
+ *
  * @author Tamás Rózsa 445653
  */
 @RestController
@@ -34,17 +36,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class PokemonSpeciesController {
 
     final static Logger logger = LoggerFactory.getLogger(PokemonSpeciesController.class);
-    
+
     @Inject
     private PokemonSpeciesFacade pokemonSpeciesFacade;
-    
+
     /**
-     * With this command
-     * curl -X POST -i -H "Content-Type: application/json" --data 
-     * '{"speciesId":"4","primaryType":"FIRE","secondaryType":"DRAGON"}' 
-     * http://localhost:8080/pa165/rest/pokemonSpecies/changeTyping
-     * the type of the pokemon species is changed.
-     * 
+     * With this command curl -X POST -i -H "Content-Type: application/json"
+     * --data '{"speciesId":"4","primaryType":"FIRE","secondaryType":"DRAGON"}'
+     * http://localhost:8080/pa165/rest/pokemonSpecies/changeTyping the type of
+     * the pokemon species is changed.
+     *
      * @param newTyping The new typing of the pokemon species.
      * @return The updated pokemon species.
      */
@@ -54,23 +55,24 @@ public class PokemonSpeciesController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public final PokemonSpeciesDTO changeTyping(@RequestBody ChangeTypingDTO newTyping) {
+    public final PokemonSpeciesDTO changeTyping(@RequestBody ChangeTypingDTO newTyping) throws NoSuchEntityException {
         logger.debug("rest changeTyping({})", newTyping);
         try {
             pokemonSpeciesFacade.changeTyping(newTyping);
             return pokemonSpeciesFacade.findPokemonSpeciesById(newTyping.getSpeciesId());
-        }
-        catch(Exception ex) {
+        } catch (NoSuchEntityException ex) {
+            throw new NoSuchEntityException();
+        } catch (Exception ex) {
             throw new ResourceNotFoundException();
         }
     }
-    
+
     /**
-     * With command 
-     * curl -X POST -i -H "Content-Type: application/json" --data 
-     * '{"speciesId":"4","preevolutionId":"3"}' 
-     * http://localhost:8080/pa165/rest/pokemonSpecies/changePreevlution
-     * the preevolution of pokemon with species id is changed.
+     * With command curl -X POST -i -H "Content-Type: application/json" --data
+     * '{"speciesId":"4","preevolutionId":"3"}'
+     * http://localhost:8080/pa165/rest/pokemonSpecies/changePreevlution the
+     * preevolution of pokemon with species id is changed.
+     *
      * @param newPreevolution The requested preevolution change.
      * @return The updated pokemon species.
      */
@@ -80,25 +82,25 @@ public class PokemonSpeciesController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public final PokemonSpeciesDTO changePreevolution(@RequestBody ChangePreevolutionDTO newPreevolution) {
+    public final PokemonSpeciesDTO changePreevolution(@RequestBody ChangePreevolutionDTO newPreevolution) throws NoSuchEntityException {
         logger.debug("rest changePreevolution({})", newPreevolution);
         try {
             pokemonSpeciesFacade.changePreevolution(newPreevolution);
             return pokemonSpeciesFacade.findPokemonSpeciesById(newPreevolution.getSpeciesId());
-        }
-        catch(CircularEvolutionChainException | EvolutionChainTooLongException ex) {
+        } catch (NoSuchEntityException ex) {
+            throw new NoSuchEntityException();
+        } catch (CircularEvolutionChainException | EvolutionChainTooLongException ex) {
             throw new InvalidPreevolutionChangeException();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new ResourceNotFoundException();
         }
     }
-    
+
     /**
-     * With the following command
-     * curl -i -X -DELETE http://localhost:8080/pa165/rest/pokemonSpecies/4
-     * a pokemon species is deleted with given id.
-     * 
+     * With the following command curl -i -X -DELETE
+     * http://localhost:8080/pa165/rest/pokemonSpecies/4 a pokemon species is
+     * deleted with given id.
+     *
      * @param id Id of the pokemon species to delete.
      */
     @RequestMapping(
@@ -110,24 +112,22 @@ public class PokemonSpeciesController {
         logger.debug("rest removePokemonSpecies({})", id);
         try {
             pokemonSpeciesFacade.removePokemonSpecies(id);
-        }
-        catch(EntityIsUsedException ex) {
+        } catch (EntityIsUsedException ex) {
             throw new EntityUsedException();
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             throw new ResourceNotFoundException();
         }
     }
-    
+
     /**
-     * With the following command
-     * curl -X POST -i -H "Content-Type: application/json" --data  
+     * With the following command curl -X POST -i -H "Content-Type:
+     * application/json" --data
      * '{"speciesName":"Charizard","primaryType":"FIRE","secondaryType":"DRAGON",
-     * "preevolutionId":"null"}' 
-     * http://localhost:8080/pa165/rest/pokemonSpecies/create
-     * a pokemon is created with the given attributes, evolves form takes an id 
-     * as an argument.
-     * 
+     * "preevolutionId":"null"}'
+     * http://localhost:8080/pa165/rest/pokemonSpecies/create a pokemon is
+     * created with the given attributes, evolves form takes an id as an
+     * argument.
+     *
      * @param species The species to create.
      * @return The created pokemon species.
      */
@@ -142,17 +142,16 @@ public class PokemonSpeciesController {
         try {
             Long id = pokemonSpeciesFacade.createPokemonSpecies(species);
             return pokemonSpeciesFacade.findPokemonSpeciesById(id);
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             throw new InvalidParameterException();
         }
     }
-    
+
     /**
-     * With the following command
-     * curl -i -X GET http://localhost:8080/pa165/rest/pokemonSpecies/1
-     * return pokemon species with the given id.
-     * 
+     * With the following command curl -i -X GET
+     * http://localhost:8080/pa165/rest/pokemonSpecies/1 return pokemon species
+     * with the given id.
+     *
      * @param id id of the pokemon species.
      * @return The found pokemon species.
      */
@@ -165,17 +164,15 @@ public class PokemonSpeciesController {
         logger.debug("rest findPokemonSpeciesById({})", id);
         try {
             return pokemonSpeciesFacade.findPokemonSpeciesById(id);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new ResourceNotFoundException();
         }
     }
-    
+
     /**
-     * The following command
-     * curl -i -X GET http://localhost:8080/pa165/rest/pokemonSpecies
-     * gets all pokemon species.
-     * 
+     * The following command curl -i -X GET
+     * http://localhost:8080/pa165/rest/pokemonSpecies gets all pokemon species.
+     *
      * @return all pokemon species
      */
     @RequestMapping(
@@ -187,18 +184,17 @@ public class PokemonSpeciesController {
         logger.debug("rest getAllPokemonSpecies()");
         try {
             return pokemonSpeciesFacade.getAllPokemonSpecies();
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             throw new ResourceNotFoundException();
         }
     }
-    
+
     /**
-     * With command 
-     * curl -i -H "Accept: application/json" -H "Content-Type: application/json"
-     * -X GET http://localhost:8080/pa165/rest/pokemonSpecies/1/allEvolutions
-     * all evolutions of pokemon species is returned.
-     * 
+     * With command curl -i -H "Accept: application/json" -H "Content-Type:
+     * application/json" -X GET
+     * http://localhost:8080/pa165/rest/pokemonSpecies/1/allEvolutions all
+     * evolutions of pokemon species is returned.
+     *
      * @param speciesId The evolutions of pokemon species to find.
      * @return All evolutions of pokemon species.
      */
@@ -212,8 +208,7 @@ public class PokemonSpeciesController {
         logger.debug("rest getAllEvolutionsOfPokemonSpecies({})", speciesId);
         try {
             return pokemonSpeciesFacade.getAllEvolutionsOfPokemonSpecies(speciesId);
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             throw new ResourceNotFoundException();
         }
     }
