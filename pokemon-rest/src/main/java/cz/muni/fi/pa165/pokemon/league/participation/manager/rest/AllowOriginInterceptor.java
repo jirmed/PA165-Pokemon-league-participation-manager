@@ -1,4 +1,4 @@
-package cz.muni.fi.pa165.pokemon.league.participation.manager;
+package cz.muni.fi.pa165.pokemon.league.participation.manager.rest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

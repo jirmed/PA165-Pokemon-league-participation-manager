@@ -1,9 +1,11 @@
-package cz.muni.fi.pa165.pokemon.league.participation.manager;
+package cz.muni.fi.pa165.pokemon.league.participation.manager.rest;
 
+import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.AllowOriginInterceptor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.SampleDataConfiguration;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.service.config.ServiceConfiguration;
 import java.text.SimpleDateFormat;
 import java.util.List;

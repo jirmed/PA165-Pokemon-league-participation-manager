@@ -1,4 +1,4 @@
-package cz.muni.fi.pa165.pokemon.league.participation.manager;
+package cz.muni.fi.pa165.pokemon.league.participation.manager.rest;
 
 import javax.servlet.Filter;
 import org.springframework.web.context.request.RequestContextListener;

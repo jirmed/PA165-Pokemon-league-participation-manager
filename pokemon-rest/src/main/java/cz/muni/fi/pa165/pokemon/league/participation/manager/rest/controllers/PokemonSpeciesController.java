@@ -1,16 +1,16 @@
-package cz.muni.fi.pa165.pokemon.league.participation.manager.controllers;
+package cz.muni.fi.pa165.pokemon.league.participation.manager.rest.controllers;
 
-import cz.muni.fi.pa165.pokemon.league.participation.manager.ApiUris;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.ApiUris;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.ChangePreevolutionDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.ChangeTypingDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.PokemonSpeciesCreateDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.PokemonSpeciesDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.CircularEvolutionChainException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EntityIsUsedException;
-import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EntityUsedException;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.exceptions.EntityUsedException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EvolutionChainTooLongException;
-import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.InvalidParameterException;
-import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.InvalidPreevolutionChangeException;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.exceptions.InvalidParameterException;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.exceptions.InvalidPreevolutionChangeException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.facade.PokemonSpeciesFacade;
 import org.springframework.web.bind.annotation.PathVariable;

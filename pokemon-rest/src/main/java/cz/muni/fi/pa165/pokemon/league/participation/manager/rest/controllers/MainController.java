@@ -1,6 +1,6 @@
-package cz.muni.fi.pa165.pokemon.league.participation.manager.controllers;
+package cz.muni.fi.pa165.pokemon.league.participation.manager.rest.controllers;
 
-import cz.muni.fi.pa165.pokemon.league.participation.manager.ApiUris;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.rest.ApiUris;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
