@@ -68,16 +68,16 @@ public class PokemonSpeciesController {
     }
 
     /**
-     * With command curl -X POST -i -H "Content-Type: application/json" --data
-     * '{"speciesId":"4","preevolutionId":"3"}'
-     * http://localhost:8080/pa165/rest/pokemonSpecies/changePreevlution the
-     * preevolution of pokemon with species id is changed.
-     *
+     * With command 
+     * curl -X POST -i -H "Content-Type: application/json" --data 
+     * '{"speciesId":"4","preevolutionId":"3"}' 
+     * http://localhost:8080/pa165/rest/pokemonSpecies/changePreevolution
+     * the preevolution of pokemon with species id is changed.
      * @param newPreevolution The requested preevolution change.
      * @return The updated pokemon species.
      */
     @RequestMapping(
-            value = "/changePreevlution",
+            value = "/changePreevolution",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -120,14 +120,14 @@ public class PokemonSpeciesController {
     }
 
     /**
-     * With the following command curl -X POST -i -H "Content-Type:
-     * application/json" --data
-     * '{"speciesName":"Charizard","primaryType":"FIRE","secondaryType":"DRAGON",
-     * "preevolutionId":"null"}'
-     * http://localhost:8080/pa165/rest/pokemonSpecies/create a pokemon is
-     * created with the given attributes, evolves form takes an id as an
-     * argument.
-     *
+     * With the following command
+     * curl -X POST -i -H "Content-Type: application/json" --data  
+     * '{"speciesName":"Charmander","primaryType":"FIRE","secondaryType":"DRAGON",
+     * "preevolutionId":"null"}' 
+     * http://localhost:8080/pa165/rest/pokemonSpecies/create
+     * a pokemon is created with the given attributes, evolves form takes an id 
+     * as an argument.
+     * 
      * @param species The species to create.
      * @return The created pokemon species.
      */
