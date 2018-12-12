@@ -31,7 +31,7 @@
                 <td><c:out value="${pokemonSpecies.speciesName}"/></td>
                 <td><c:out value="${pokemonSpecies.primaryType}"/></td>
                 <td><c:out value="${pokemonSpecies.secondaryType}"/></td>
-                <td><c:out value="${pokemonSpecies.evolvesFrom}"/></td>
+                <td><c:out value="${pokemonSpecies.evolvesFrom.speciesName}"/></td>
                 <td>
                     <my:extraTag href="/pokemonSpecies/changeTyping/${pokemonSpecies.id}" class='btn btn-primary'>
                         <span class="glyphicon glyphicon-edit"></span> 
