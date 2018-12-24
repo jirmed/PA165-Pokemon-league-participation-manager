@@ -8,6 +8,8 @@ import cz.muni.fi.pa165.pokemon.league.participation.manager.enums.PokemonType;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.DataAccessException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EntityIsUsedException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.InsufficientRightsException;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.service.utils.DAOExceptionWrapper;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.utils.GymAndBadge;
 import java.util.List;
 import java.util.NoSuchElementException;
 import javax.inject.Inject;
@@ -34,38 +36,27 @@ public class GymServiceImpl implements GymService {
         if (usedGym != null) {
             throw new EntityIsUsedException("Trainer already used in gym " + usedGym.toString());
         }
-        try {
-            gymDAO.createGym(gym);
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot create new gym " + gym.toString(), ex) {
-            };
-        }
+        DAOExceptionWrapper.withoutResult(() -> gymDAO.createGym(gym), "Cannot create new gym " + gym.toString());
     }
 
     @Override
     public void updateGymLocation(Gym gym, String newLocation) {
-        try {
+        DAOExceptionWrapper.withoutResult(() -> {
             gym.setLocation(newLocation);
             gymDAO.updateGym(gym);
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot update location fot gym " + gym.toString(), ex) {
-            };
-        }
+        }, "Cannot update location fot gym " + gym.toString());
     }
 
     @Override
     public void changeGymType(Gym gym, Trainer trainer, PokemonType newType)
             throws InsufficientRightsException {
-        if (gym.getGymLeader() != trainer) {
+        if (!gym.getGymLeader().equals(trainer)) {
             throw new InsufficientRightsException("Only Gym Leader may change Gym Type");
         }
-        try {
+        DAOExceptionWrapper.withoutResult(() -> {
             gym.setType(newType);
             gymDAO.updateGym(gym);
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot change gym type for gym " + gym.toString(), ex) {
-            };
-        }
+        }, "Cannot change gym type for gym " + gym.toString());
     }
 
     @Override
@@ -73,51 +64,32 @@ public class GymServiceImpl implements GymService {
         if (!newGymLeader.equals(gym.getGymLeader())) {
             Gym usedGym = this.findGymByLeader(newGymLeader);
             if (usedGym != null) {
-                throw new EntityIsUsedException("Gymleader already use on Gym " + usedGym.toString());
+                throw new EntityIsUsedException("Gym leader already used on Gym " + usedGym.toString());
             }
         }
-        try {
+        DAOExceptionWrapper.withoutResult(() -> {
             gym.setGymLeader(newGymLeader);
+            gym.setType(null);
             gymDAO.updateGym(gym);
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot change gym leader for gym " + gym.toString(), ex) {
-            };
-        }
+        }, "Cannot change gym leader for gym " + gym.toString());
     }
 
     @Override
     public void removeGym(Gym gym) throws EntityIsUsedException {
-
-        if (badgeDAO.findBadgesOfGym(gym).size() != 0) {
+        if (!badgeDAO.findBadgesOfGym(gym).isEmpty()) {
             throw new EntityIsUsedException("Gym is used on badge(s)");
         }
-
-        try {
-            gymDAO.deleteGym(gym);
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot remove the following gym " + gym.toString(), ex) {
-            };
-        }
+        DAOExceptionWrapper.withoutResult(() -> gymDAO.deleteGym(gym), "Cannot remove the following gym " + gym.toString());
     }
 
     @Override
     public Gym findGymById(Long id) {
-        try {
-            return gymDAO.findGymById(id);
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot find gym with id " + id, ex) {
-            };
-        }
+        return DAOExceptionWrapper.withResult(() -> gymDAO.findGymById(id), "Cannot find gym with id " + id);
     }
 
     @Override
     public List<Gym> getAllGyms() {
-        try {
-            return gymDAO.getAllGyms();
-        } catch (Exception ex) {
-            throw new DataAccessException("Cannot get all gyms.", ex) {
-            };
-        }
+        return DAOExceptionWrapper.withResult(() -> gymDAO.getAllGyms(), "Cannot get all gyms.");
     }
 
     @Override
@@ -150,5 +122,10 @@ public class GymServiceImpl implements GymService {
             throw new DataAccessException("Cannot fing the gym for the following trainer " + trainer.toString(), ex) {
             };
         }
+    }
+
+    @Override
+    public List<GymAndBadge> getAllGymsAndBadgesOfTrainer(Trainer trainer) {
+        return DAOExceptionWrapper.withResult(() -> gymDAO.getAllGymsAndBadgesOfTrainer(trainer), "getAllGymsAndBadgesOfTrainer failed");
     }
 }

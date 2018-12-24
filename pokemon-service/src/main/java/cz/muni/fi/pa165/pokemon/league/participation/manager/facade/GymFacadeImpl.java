@@ -2,14 +2,17 @@ package cz.muni.fi.pa165.pokemon.league.participation.manager.facade;
 
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.ChangeGymLeaderDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.ChangeGymTypeDTO;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.GymAndBadgeDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.GymCreateDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.GymDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.TrainerDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.dto.UpdateGymLocationDTO;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.entities.Gym;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.entities.Trainer;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.enums.PokemonType;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.EntityIsUsedException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.InsufficientRightsException;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.exceptions.NoSuchEntityException;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.service.GymService;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.service.TrainerService;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.service.BeanMappingService;
@@ -39,8 +42,13 @@ public class GymFacadeImpl implements GymFacade {
     private BeanMappingService beanMappingService;
     
     @Override
-    public Long createGym(GymCreateDTO gym) throws EntityIsUsedException {
+    public Long createGym(GymCreateDTO gym) throws EntityIsUsedException, NoSuchEntityException {
+        Trainer leader = trainerService.getTrainerWithId(gym.getGymLeaderID());
+        if (leader == null) {
+            throw new NoSuchEntityException("The selected trainer doesn't exist");
+        }
         Gym gymEntity = beanMappingService.mapTo(gym, Gym.class);
+        gymEntity.setGymLeader(leader);
         gymService.createGym(gymEntity);
         return gymEntity.getId();
     }
@@ -52,14 +60,21 @@ public class GymFacadeImpl implements GymFacade {
 
     @Override
     public void changeGymType(ChangeGymTypeDTO gym) throws InsufficientRightsException {
-        gymService.changeGymType(beanMappingService.mapTo(findGymById(gym.getGymId()), Gym.class),
-                trainerService.getTrainerWithId(gym.getTrainerId()), gym.getNewGymType());
+        gymService.changeGymType(gymService.findGymById(gym.getId()),
+                trainerService.getTrainerWithId(gym.getTrainerId()), gym.getType());
     }
 
     @Override
-    public void changeGymLeader(ChangeGymLeaderDTO gym) throws EntityIsUsedException {
-        gymService.changeGymLeader(beanMappingService.mapTo(findGymById(gym.getGymID()), Gym.class),
-                trainerService.getTrainerWithId(gym.getNewGymLeaderID()));
+    public void changeGymLeader(ChangeGymLeaderDTO gym) throws EntityIsUsedException, NoSuchEntityException {
+        Gym gymEntity = gymService.findGymById(gym.getId());
+        Trainer trainer = trainerService.getTrainerWithId(gym.getGymLeader());
+        if (gymEntity == null) {
+            throw new NoSuchEntityException("No gym of such ID exists");
+        }
+        if (trainer == null) {
+            throw new NoSuchEntityException("No trainer of such ID exists");
+        }
+        gymService.changeGymLeader(gymEntity, trainer);
     }
 
     @Override
@@ -96,5 +111,15 @@ public class GymFacadeImpl implements GymFacade {
                 gymService.getAllGyms().stream()
                         .filter((gym) -> gym.getGymLeader().getId().equals(trainerId)).findFirst().get(),
                 GymDTO.class);
+    }
+
+    @Override
+    public List<GymAndBadgeDTO> getAllGymsAndBadgesOfTrainer(Long trainerId)
+            throws NoSuchEntityException {
+        Trainer t = trainerService.getTrainerWithId(trainerId);
+        if (t == null) {
+            throw new NoSuchEntityException("No trainer of given ID exists");
+        }
+        return beanMappingService.mapTo(gymService.getAllGymsAndBadgesOfTrainer(t), GymAndBadgeDTO.class);
     }
 }

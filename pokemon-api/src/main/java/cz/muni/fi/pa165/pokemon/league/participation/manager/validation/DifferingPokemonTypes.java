@@ -6,16 +6,17 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
+import java.util.Arrays;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
  * DifferingPokemonTypes annotation for verifying whether the given Pokemon types
- fields differ.
+ * fields differ.
  * 
  * @author Tibor Zauko 433531
- Based on AllOrNothing annotation from fi-muni/PA165.
+ * Based on AllOrNothing annotation from fi-muni/PA165.
  */
 @Target( { TYPE })
 @Retention(RUNTIME)
@@ -29,9 +30,6 @@ public @interface DifferingPokemonTypes {
 
     Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
-    
-    String [] members() default {};
-    
+    Class<? extends Payload>[] payload() default {};    
     
 }

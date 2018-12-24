@@ -1,7 +1,7 @@
 package cz.muni.fi.pa165.pokemon.league.participation.manager.dao;
 
 import cz.muni.fi.pa165.pokemon.league.participation.manager.builders.TrainerBuilder;
-import cz.muni.fi.pa165.pokemon.league.participation.manager.common.PersistenceApplicationContext;
+import cz.muni.fi.pa165.pokemon.league.participation.manager.utils.PersistenceApplicationContext;
 import cz.muni.fi.pa165.pokemon.league.participation.manager.entities.Trainer;
 import org.junit.Before;
 import org.junit.Test;
@@ -144,5 +144,18 @@ public class TrainerDAOTest {
         trainerDAO.createTrainer(adminTrainer);
 
         assertThat(trainerDAO.getAdminCount()).isEqualTo(1L);
+    }
+
+    @Test
+    public void findTrainerByUserNameTest() {
+        trainerDAO.createTrainer(ashTrainer);
+        assertThat(trainerDAO.findTrainerByUsername(ashTrainer.getUserName()))
+                .isEqualToComparingFieldByField(ashTrainer);
+    }
+
+    @Test
+    public void findTrainerByNonExistentUserNameTest() {
+        assertThat(trainerDAO.findTrainerByUsername("wrong_user_name"))
+                .isNull();
     }
 }
